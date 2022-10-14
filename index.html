@@ -61,21 +61,21 @@
                         <div class="row col-lg-12 mt-3">
                             <div class="col-lg-6">
                                 <label>Full Name</label>
-                                <input type="text" id="fullName" name="fullName" class="form-control">
+                                <input type="text" id="fullNameCre" name="fullNameCre" class="form-control">
                             </div>
                             <div class="col-lg-6">
                                 <label>Email</label>
-                                <input type="email" id="email" name="email" class="form-control">
+                                <input type="email" id="emailCre" name="emailCre" class="form-control">
                             </div>
                         </div>
                         <div class="row col-lg-12 mt-3">
                             <div class="col-lg-6">
                                 <label>Phone</label>
-                                <input type="tel" id="phone" name="phone" class="form-control">
+                                <input type="tel" id="phoneCre" name="phoneCre" class="form-control">
                             </div>
                             <div class="col-lg-6">
                                 <label>Address</label>
-                                <input type="text" id="address" name="address" class="form-control">
+                                <input type="text" id="addressCre" name="addressCre" class="form-control">
                             </div>
                         </div>
                     </form>
@@ -133,94 +133,142 @@
         </div>
     </div>
 
+    <div class="modal fade" id="modalWithdraw" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" >
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Modal withdraw</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="frmWithdraw" method="post">
+                        <div class="row col-lg-12 mt-3">
+                            <div class="col-lg-6">
+                                <label>Customer ID</label>
+                                <input type="text" id="customerIdWd" name="customerIdWd" class="form-control">
+                            </div>
+                            <div class="col-lg-6">
+                                <label>Full Name</label>
+                                <input type="text" id="fullNameWd" name="fullNameWd" class="form-control">
+                            </div>
+                        </div>
+                        <div class="row col-lg-12 mt-3">
+                            <div class="col-lg-6">
+                                <label>Current balance ($)</label>
+                                <input type="text" id="balanceWd" name="balanceWd" class="form-control">
+                            </div>
+                            <div class="col-lg-6">
+                                <label>Transaction Amount ($)</label>
+                                <input type="text" id="transactionAmountWd" name="transactionAmountWd" class="form-control">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="btnWithdraw" class="btn btn-outline-warning">
+                        <i class="fas fa-minus"></i>
+                        Withdraw
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script type="text/javascript" src="/assets/jquery/jquery-v3.6.0.min.js"></script>
     <script type="text/javascript" src="/assets/jquery/jquery.validate-v1.19.5.min.js"></script>
     <script type="text/javascript" src="/assets/sweetalert/v2/sweetalert2.js"></script>
     <script type="text/javascript" src="/assets/bootstrap/v5.2.2/js/bootstrap.bundle.min.js"></script>
     <script type="text/javascript" src="/assets/js/popper-v1.16.0.min.js"></script>
 
+    <script src="/assets/js/app.js"></script>
+
     <script>
 
-        let customer = {};
+        let page = {
+            urls: {
+                getAllCustomers: App.BASE_URL_CUSTOMER,
+                getCustomerById: App.BASE_URL_CUSTOMER,
+                createCustomer: App.BASE_URL_CUSTOMER + "/create",
+                deposit: App.BASE_URL_CUSTOMER + "/deposit",
+                withdraw: App.BASE_URL_CUSTOMER + "/withdraw"
+            },
+            elements: {},
+            loadData: {},
+            commands: {},
+            dialogs: {
+                elements: {},
+                loadData: {},
+                commands: {},
+            }
+        }
 
-        function getAllCustomers() {
+        let customer = new Customer();
+        let withdraw = new Withdraw();
+
+        page.elements.tbCustomer = $("#tbCustomer tbody");
+        page.elements.modalCreate = $("#modalCreate");
+        page.elements.modalDeposit = $("#modalDeposit");
+
+        page.dialogs.elements.frmCreate = $("#frmCreate");
+        page.dialogs.elements.fullNameCre = $("#fullNameCre");
+        page.dialogs.elements.emailCre = $("#emailCre");
+        page.dialogs.elements.phoneCre = $("#phoneCre");
+        page.dialogs.elements.addressCre = $("#addressCre");
+        page.dialogs.elements.btnCreate = $("#btnCreate");
+
+        page.dialogs.elements.modalWithdraw = $("#modalWithdraw");
+        page.dialogs.elements.frmWithdraw = $("#frmWithdraw");
+        page.dialogs.elements.customerIdWd = $("#customerIdWd");
+        page.dialogs.elements.fullNameWd = $("#fullNameWd");
+        page.dialogs.elements.balanceWd = $("#balanceWd");
+        page.dialogs.elements.transactionAmountWd = $("#transactionAmountWd");
+        page.dialogs.elements.btnWithdraw = $("#btnWithdraw");
+
+
+        page.commands.getAllCustomers = () => {
             $.ajax({
                 headers: {
                     "accept": "application/json",
                     "content-type": "application/json"
                 },
                 type: "GET",
-                url: "http://localhost:8089/api/customers"
+                url: page.urls.getAllCustomers
             })
             .done((data) => {
                 data.map(item => {
-                    let str = `
-                        <tr id="tr_${item.id}">
-                            <td>${item.id}</td>
-                            <td>${item.fullName}</td>
-                            <td>${item.email}</td>
-                            <td class="text-center">${item.phone}</td>
-                            <td>${item.address}</td>
-                            <td class="text-end num-space">${item.balance}</td>
-                            <td class="text-center">
-                                <a class="btn btn-outline-secondary" title="" data-toggle="tooltip"  data-bs-original-title="Edit">
-                                    <i class="fas fa-edit"></i>
-                                </a>
-                            </td>
-                            <td class="text-center">
-                                <a class="btn btn-outline-success deposit" data-id="${item.id}" title="" data-toggle="tooltip" data-bs-original-title="Deposit">
-                                    <i class="fas fa-plus"></i>
-                                </a>
-                            </td>
-                            <td class="text-center">
-                                <a class="btn btn-outline-warning" title="" data-toggle="tooltip" data-bs-original-title="Withdraw">
-                                    <i class="fas fa-minus"></i>
-                                </a>
-                            </td>
-                            <td class="text-center">
-                                <a class="btn btn-outline-primary" title="" data-toggle="tooltip" data-bs-original-title="Transfer">
-                                    <i class="fas fa-exchange-alt"></i>
-                                </a>
-                            </td>
-                            <td class="text-center">
-                                <a class="btn btn-outline-danger" title="" data-toggle="tooltip" data-bs-original-title="Suspended">
-                                    <i class="fas fa-trash-alt"></i>
-                                </a>
-                            </td>
-                        </tr>
-                    `;
-                    $("#tbCustomer tbody").prepend(str);
+                    page.elements.tbCustomer.prepend(App.renderRowCustomer(item));
                 });
                 
-                handleOpenModalDeposit();
+                page.commands.handleOpenModalDeposit();
+                page.commands.handleOpenModalWithdraw();
             })
             .fail((jqXHR) => {
-                alert("Get All cutomers Fail");
+                App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_500);
             })
         }
 
-        function getCustomerById(customerId) {
+        page.commands.getCustomerById = (customerId) => {
             return $.ajax({
                 headers: {
                     "accept": "application/json",
                     "content-type": "application/json"
                 },
                 type: "GET",
-                url: "http://localhost:8089/api/customers/" + customerId
+                url: page.urls.getCustomerById + "/" + customerId
             })
             .done((data) => {
                 customer = data;
             })
             .fail((jqXHR) => {
-
-            })
+                console.log("jqXHR ======");
+                console.log(jqXHR);
+            });
         }
 
         $("#btnShowCreateModal").on("click", () => {
             $("#modalCreate").modal("show");
         });
-
-        
 
         $("#btnCreate").on("click", () => {
             $("#frmCreate").trigger("submit");
@@ -230,11 +278,15 @@
             $("#frmDeposit").trigger("submit");
         })
 
-        function handleOpenModalDeposit() {
+        page.dialogs.elements.btnWithdraw.on("click", () => {
+            page.dialogs.elements.frmWithdraw.trigger("submit");
+        })
+
+        page.commands.handleOpenModalDeposit = () => {
             $(".deposit").on("click", function () {
                 let customerId = $(this).data("id");
 
-                getCustomerById(customerId).then(() => {
+                page.commands.getCustomerById(customerId).then(() => {
                     $("#customerIdDep").val(customer.id);
                     $("#fullNameDep").val(customer.fullName);
                     $("#balanceDep").val(customer.balance);
@@ -242,23 +294,42 @@
                     $("#modalDeposit").modal("show");
                 })
                 .catch(() => {
-                    alert("Customer not found");
+                    console.log("get deposit fail");
+                    App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_404);
                 });
             });
         }
 
-        function removeEventOpenModalDeposit() {
-            $(".deposit").off();
+        page.commands.handleOpenModalWithdraw = () => {
+            $(".withdraw").on("click", function () {
+                let customerId = $(this).data("id");
+
+                page.commands.getCustomerById(customerId).then(() => {
+                    page.dialogs.elements.customerIdWd.val(customer.id);
+                    page.dialogs.elements.fullNameWd.val(customer.fullName);
+                    page.dialogs.elements.balanceWd.val(customer.balance);
+
+                    page.dialogs.elements.modalWithdraw.modal("show");
+                })
+                .catch(() => {
+                    App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_404);
+                });
+            });
         }
 
-        function createCustomer() {
 
-            let customer = {
-                fullName: $("#fullName").val(),
-                email: $("#email").val(),
-                phone: $("#phone").val(),
-                address: $("#address").val(),
-            }
+        page.commands.removeEventOpenModal = () => {
+            $(".deposit").off();
+            $(".withdraw").off();
+        }
+
+        page.commands.createCustomer = () => {
+            customer.id = 0;
+            customer.fullName = page.dialogs.elements.fullNameCre.val();
+            customer.email = page.dialogs.elements.emailCre.val();
+            customer.phone = page.dialogs.elements.phoneCre.val();
+            customer.address = page.dialogs.elements.addressCre.val();
+            customer.balance = 0;
 
             $.ajax({
                 headers: {
@@ -266,55 +337,20 @@
                     "content-type": "application/json"
                 },
                 type: "POST",
-                url: "http://localhost:8089/api/customers/create",
+                url: page.urls.createCustomer,
                 data: JSON.stringify(customer)
             })
             .done((data) => {
-                let str = `
-                    <tr>
-                        <td>${data.id}</td>
-                        <td>${data.fullName}</td>
-                        <td>${data.email}</td>
-                        <td class="text-center">${data.phone}</td>
-                        <td>${data.address}</td>
-                        <td class="text-end num-space">${data.balance}</td>
-                        <td class="text-center">
-                            <a class="btn btn-outline-secondary" title="" data-toggle="tooltip"  data-bs-original-title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                        </td>
-                        <td class="text-center">
-                            <a class="btn btn-outline-success deposit" title="" data-toggle="tooltip" data-bs-original-title="Deposit">
-                                <i class="fas fa-plus"></i>
-                            </a>
-                        </td>
-                        <td class="text-center">
-                            <a class="btn btn-outline-warning" title="" data-toggle="tooltip" data-bs-original-title="Withdraw">
-                                <i class="fas fa-minus"></i>
-                            </a>
-                        </td>
-                        <td class="text-center">
-                            <a class="btn btn-outline-primary" title="" data-toggle="tooltip" data-bs-original-title="Transfer">
-                                <i class="fas fa-exchange-alt"></i>
-                            </a>
-                        </td>
-                        <td class="text-center">
-                            <a class="btn btn-outline-danger" title="" data-toggle="tooltip" data-bs-original-title="Suspended">
-                                <i class="fas fa-trash-alt"></i>
-                            </a>
-                        </td>
-                    </tr>
-                `;
+                page.elements.tbCustomer.prepend(App.renderRowCustomer(data));
 
-                $("#tbCustomer tbody").prepend(str);
+                page.commands.removeEventOpenModal();
+                page.commands.handleOpenModalDeposit();
+                page.commands.handleOpenModalWithdraw();
 
-                removeEventOpenModalDeposit();
-                handleOpenModalDeposit();
-
-                $("#modalCreate").modal("hide");
+                page.elements.modalCreate.modal("hide");
             })
             .fail((jqXHR) => {
-                alert("Create Fail");
+                App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_400);
             })
         }
 
@@ -331,77 +367,73 @@
                     "content-type": "application/json"
                 },
                 type: "POST",
-                url: "http://localhost:8089/api/customers/deposit",
+                url: page.urls.deposit,
                 data: JSON.stringify(deposit)
             })
             .done((data) => {
-                let str = `
-                    <tr id="tr_${data.id}">
-                        <td>${data.id}</td>
-                        <td>${data.fullName}</td>
-                        <td>${data.email}</td>
-                        <td class="text-center">${data.phone}</td>
-                        <td>${data.address}</td>
-                        <td class="text-end num-space">${data.balance}</td>
-                        <td class="text-center">
-                            <a class="btn btn-outline-secondary" title="" data-toggle="tooltip"  data-bs-original-title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </a>
-                        </td>
-                        <td class="text-center">
-                            <a class="btn btn-outline-success deposit" data-id="${data.id}" title="" data-toggle="tooltip" data-bs-original-title="Deposit">
-                                <i class="fas fa-plus"></i>
-                            </a>
-                        </td>
-                        <td class="text-center">
-                            <a class="btn btn-outline-warning" title="" data-toggle="tooltip" data-bs-original-title="Withdraw">
-                                <i class="fas fa-minus"></i>
-                            </a>
-                        </td>
-                        <td class="text-center">
-                            <a class="btn btn-outline-primary" title="" data-toggle="tooltip" data-bs-original-title="Transfer">
-                                <i class="fas fa-exchange-alt"></i>
-                            </a>
-                        </td>
-                        <td class="text-center">
-                            <a class="btn btn-outline-danger" title="" data-toggle="tooltip" data-bs-original-title="Suspended">
-                                <i class="fas fa-trash-alt"></i>
-                            </a>
-                        </td>
-                    </tr>
-                `;
-
                 let currentRow = $("#tr_" + data.id);
 
-                currentRow.replaceWith(str);
+                currentRow.replaceWith(App.renderRowCustomer(data));
 
-                removeEventOpenModalDeposit();
-                handleOpenModalDeposit();
+                page.commands.removeEventOpenModal();
+                page.commands.handleOpenModalDeposit();
+                page.commands.handleOpenModalWithdraw();
 
                 $("#modalDeposit").modal("hide");
             })
             .fail((jqXHR) => {
-                alert("Deposit Fail");
+                App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_400);
             })
         }
 
-        $("#frmCreate").validate({
+        page.dialogs.commands.withdraw = () => {
+            withdraw.id = 0;
+            withdraw.customerId = page.dialogs.elements.customerIdWd.val();
+            withdraw.transactionAmount = page.dialogs.elements.transactionAmountWd.val();
+
+            $.ajax({
+                headers: {
+                    "accept": "application/json",
+                    "content-type": "application/json"
+                },
+                type: "POST",
+                url: page.urls.withdraw,
+                data: JSON.stringify(withdraw)
+            })
+            .done((data) => {
+                let currentRow = $("#tr_" + data.id);
+
+                currentRow.replaceWith(App.renderRowCustomer(data));
+
+                page.commands.removeEventOpenModal();
+                page.commands.handleOpenModalDeposit();
+                page.commands.handleOpenModalWithdraw();
+
+                page.dialogs.elements.modalWithdraw.modal("hide");
+                App.SweetAlert.showAlertSuccess(App.AlertMessageVi.SUCCESS_WITHDRAW);
+            })
+            .fail((jqXHR) => {
+                App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_400);
+            })
+        }
+
+        page.dialogs.elements.frmCreate.validate({
             rules: {
-                fullName: {
+                fullNameCre: {
                     required: true,
                     minlength: 5,
                     maxlength: 35
                 }
             },
             messages: {
-                fullName: {
+                fullNameCre: {
                     required: "Vui lòng nhập tên đầy đủ",
                     minlength: "Họ tên tối thiểu 5 ký tự",
                     maxlength: "Họ tên tối đa 35 ký tự"
                 }
             },
             submitHandler: function () {
-                createCustomer();
+                page.commands.createCustomer();
             }
         })
 
@@ -425,8 +457,27 @@
             }
         })
 
+        page.dialogs.elements.frmWithdraw.validate({
+            rules: {
+                transactionAmountWd: {
+                    required: true,
+                    min: 500,
+                    max: 1000000
+                }
+            },
+            messages: {
+                transactionAmountWd: {
+                    required: "Vui lòng nhập số tiền giao dịch đầy đủ",
+                    min: "Số tiền giao dịch tối thiểu là {0}",
+                    max: "Số tiền giao dịch tối đa là {0}"
+                }
+            },
+            submitHandler: function () {
+                page.dialogs.commands.withdraw();
+            }
+        });
 
-        getAllCustomers();
+        page.commands.getAllCustomers();
 
     </script>
 
