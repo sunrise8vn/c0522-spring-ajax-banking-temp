@@ -3,7 +3,7 @@
 }
 
 .show {
-    display: block;
+    display: block !important;
 }
 
 header {
@@ -64,4 +64,18 @@ header .btn {
     cursor: pointer;
     right: 65px;
     position: absolute;
+}
+
+.modal-alert-danger {
+    padding: 10px 35px;
+    margin-bottom: 15px;
+    color: #842029;
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+}
+
+label.error {
+    display: list-item;
+    margin-top: 5px;
+    color: #842029;
 }

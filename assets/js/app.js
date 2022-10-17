@@ -62,6 +62,18 @@ class App {
                 showConfirmButton: true
             })
         }
+
+        static showSuspendedConfirmDialog() {
+            return Swal.fire({
+                icon: 'warning',
+                text: 'Are you sure to suspend the selected customer ?',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, please suspend this client !',
+                cancelButtonText: 'Cancel',
+            })
+        }
     }
 
     static renderRowCustomer(obj) {
@@ -117,10 +129,39 @@ class Customer {
     }
 }
 
+class Sender extends Customer {
+    constructor() {
+        super();
+    }
+}
+
+class Recipient extends Customer {
+    constructor() {
+        super();
+    }
+}
+
 class Withdraw {
     constructor(id, customerId, transactionAmount) {
         this.id = id;
         this.customerId =customerId;
         this.transactionAmount = transactionAmount;
+    }
+}
+
+class Deposit {
+    constructor(id, customerId, transactionAmount) {
+        this.id = id;
+        this.customerId =customerId;
+        this.transactionAmount = transactionAmount;
+    }
+}
+
+class Transfer {
+    constructor(id, senderId, recipientId, transferAmount) {
+        this.id = id;
+        this.senderId = senderId;
+        this.recipientId = recipientId;
+        this.transferAmount = transferAmount;
     }
 }
