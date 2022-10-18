@@ -3,13 +3,13 @@
 
 <head>
     <title>List of customers</title>
-    <link rel="shortcut icon" href="/assets/favicon.ico">
+    <link rel="shortcut icon" href="./assets/favicon.ico">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="/assets/bootstrap/v5.2.2/css/bootstrap.css">
-    <link rel="stylesheet" href="/assets/font-awesome/v5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="/assets/sweetalert/v2/sweetalert2.min.css">
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="./assets/bootstrap/v5.2.2/css/bootstrap.css">
+    <link rel="stylesheet" href="./assets/font-awesome/v5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="./assets/sweetalert/v2/sweetalert2.min.css">
+    <link rel="stylesheet" href="./assets/css/style.css">
 </head>
 
 <body>
@@ -242,13 +242,13 @@
         </div>
     </div>
 
-    <script type="text/javascript" src="/assets/jquery/jquery-v3.6.0.min.js"></script>
-    <script type="text/javascript" src="/assets/jquery/jquery.validate-v1.19.5.min.js"></script>
-    <script type="text/javascript" src="/assets/sweetalert/v2/sweetalert2.js"></script>
-    <script type="text/javascript" src="/assets/bootstrap/v5.2.2/js/bootstrap.bundle.min.js"></script>
-    <script type="text/javascript" src="/assets/js/popper-v1.16.0.min.js"></script>
+    <script type="text/javascript" src="./assets/jquery/jquery-v3.6.0.min.js"></script>
+    <script type="text/javascript" src="./assets/jquery/jquery.validate-v1.19.5.min.js"></script>
+    <script type="text/javascript" src="./assets/sweetalert/v2/sweetalert2.js"></script>
+    <script type="text/javascript" src="./assets/bootstrap/v5.2.2/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="./assets/js/popper-v1.16.0.min.js"></script>
 
-    <script src="/assets/js/app.js"></script>
+    <script src="./assets/js/app.js"></script>
 
     <script>
         let page = {
@@ -332,6 +332,8 @@
                     page.commands.handleOpenModalWithdraw();
                     page.commands.handleOpenModalTransfer();
                     page.commands.handleDeleteCustomer();
+
+                    page.commands.initTooltip();
                 })
                 .fail((jqXHR) => {
                     App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_500);
@@ -520,14 +522,17 @@
                 })
                 .done((data) => {
                     page.elements.tbCustomer.prepend(App.renderRowCustomer(data));
-
+                    
+                    
                     page.commands.removeEventOpenModal();
                     page.commands.handleOpenModalDeposit();
                     page.commands.handleOpenModalWithdraw();
-                    page.console.handleOpenModalTransfer();
+                    page.commands.handleOpenModalTransfer();
                     page.commands.handleDeleteCustomer();
-
+                    
+                    page.commands.initTooltip();
                     page.elements.modalCreate.modal("hide");
+
                 })
                 .fail((jqXHR) => {
                     App.SweetAlert.showAlertError(App.AlertMessageVi.ERROR_400);
@@ -785,12 +790,18 @@
             }
         });
 
+        page.commands.initTooltip = () => {
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+        }
+
         page.initializeEventControl = () => {
             page.commands.handleCloseModalWithdraw();
 
             page.commands.handleCloseModalTransfer();
 
             page.commands.handleChangeTransferAmountTrf();
+
         }
 
         page.loadData = () => {

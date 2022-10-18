@@ -6,6 +6,17 @@
     display: block !important;
 }
 
+table th {
+    background-color: #4CAF50 !important;
+    color: #fff;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+table thead th {
+    border: 0 solid #ddd;
+}
+
 header {
     background: #299be4;
     color: #fff;

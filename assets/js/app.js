@@ -91,7 +91,7 @@ class App {
                     </a>
                 </td>
                 <td class="text-center">
-                    <a class="btn btn-outline-success deposit" data-id="${obj.id}" title="" data-toggle="tooltip" data-bs-original-title="Deposit">
+                    <a class="btn btn-outline-success deposit" data-id="${obj.id}" title="" data-bs-toggle="tooltip" data-bs-placement="top"  data-bs-title="Deposit">
                         <i class="fas fa-plus"></i>
                     </a>
                 </td>
@@ -110,6 +110,25 @@ class App {
                         <i class="fas fa-trash-alt"></i>
                     </a>
                 </td>
+            </tr>
+        `;
+
+        return str;
+    }
+
+
+    static renderRowTransferHistory(obj) {
+        let str = `
+            <tr id="tr_${obj.id}">
+                <td>${obj.id}</td>
+                <td>${obj.createdAt}</td>
+                <td>${obj.senderId}</td>
+                <td>${obj.senderName}</td>
+                <td>${obj.recipientId}</td>
+                <td>${obj.recipientName}</td>
+                <td class="text-end num-space">${obj.transferAmount}</td>
+                <td class="text-end num-space">${obj.fees}</td>
+                <td class="text-end num-space">${obj.feesAmount}</td>
             </tr>
         `;
 
